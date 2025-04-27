@@ -6,4 +6,5 @@ data class UiImageItem(
     val contentDescription: String,
     val imagePageLink: String,
     val photographer: String,
+    val isFavorite: Boolean = false,
 )

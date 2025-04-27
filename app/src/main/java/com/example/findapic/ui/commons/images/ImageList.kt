@@ -13,14 +13,14 @@ import androidx.compose.ui.unit.dp
 import com.example.findapic.ui.theme.FindAPicTheme
 
 @Composable
-fun ImageList(imageItems: List<UiImageItem>) {
+fun ImageList(imageItems: List<UiImageItem>, onFavoriteButtonClick: (UiImageItem) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(imageItems) { imageItem ->
-                ImageCard(imageItem)
+                ImageCard(imageItem, onFavoriteButtonClick)
             }
         }
     }
@@ -30,7 +30,7 @@ fun ImageList(imageItems: List<UiImageItem>) {
 @Composable
 fun ImageListPreview() {
     FindAPicTheme {
-        ImageList(imageItems)
+        ImageList(imageItems) { }
     }
 }
 

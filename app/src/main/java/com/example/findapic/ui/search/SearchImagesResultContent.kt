@@ -12,9 +12,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.findapic.R
 import com.example.findapic.ui.commons.images.ImageList
+import com.example.findapic.ui.commons.images.UiImageItem
 
 @Composable
-fun SearchImagesResultContent(query: String, currentViewState: SearchImagesViewState) {
+fun SearchImagesResultContent(
+    query: String,
+    currentViewState: SearchImagesViewState,
+    onFavoriteButtonClick: (UiImageItem) -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -29,7 +34,7 @@ fun SearchImagesResultContent(query: String, currentViewState: SearchImagesViewS
             }
 
             is SearchImagesViewState.ImageResultsSuccess -> {
-                ImageList(currentViewState.imageResults)
+                ImageList(currentViewState.imageResults, onFavoriteButtonClick)
             }
 
             SearchImagesViewState.Loading -> {

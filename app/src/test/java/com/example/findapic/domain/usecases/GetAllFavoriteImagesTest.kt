@@ -1,9 +1,7 @@
-package com.example.findapic.domain
+package com.example.findapic.domain.usecases
 
 import com.example.findapic.domain.models.ImageResource
 import com.example.findapic.domain.repositories.ImagesRepository
-import com.example.findapic.domain.usecases.SearchImagesUseCase
-import com.example.findapic.domain.usecases.SearchImagesUseCaseImpl
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -12,17 +10,17 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class SearchImagesTest {
+class GetAllFavoriteImagesTest {
     private val imagesRepository = mockk<ImagesRepository>()
-    private lateinit var searchImagesUseCase: SearchImagesUseCase
+    private lateinit var getAllFavoriteImagesUseCase: GetAllFavoriteImagesUseCase
 
     @Before
     fun setup() {
-        searchImagesUseCase = SearchImagesUseCaseImpl(imagesRepository)
+        getAllFavoriteImagesUseCase = GetAllFavoriteImagesUseCaseImpl(imagesRepository)
     }
 
     @Test
-    fun `searchImages should return successful result of image resources`() = runTest {
+    fun `getAllFavoriteImages should return successful result of image resources`() = runTest {
         val imageResources = listOf(
             ImageResource(
                 id = 0,
@@ -30,21 +28,15 @@ class SearchImagesTest {
                 description = "Brown Rocks During Golden Hour",
                 imagePageUrl = "https://www.pexels.com/photo/brown-rocks-during-golden-hour-2014422/",
                 photographer = "Joey Farina",
-            ),
-            ImageResource(
-                id = 1,
-                source = "source",
-                description = "description",
-                photographer = "photographer",
-                imagePageUrl = "image page link",
+                isFavorite = true,
             ),
         )
 
-        coEvery { imagesRepository.searchImages(any()) } returns flowOf(
+        coEvery { imagesRepository.getAllFavoriteImages() } returns flowOf(
             Result.success(imageResources)
         )
 
-        searchImagesUseCase.searchImages("").collect {
+        getAllFavoriteImagesUseCase.getAllFavoriteImages().collect {
             assertThat(it).isEqualTo(Result.success(imageResources))
         }
     }

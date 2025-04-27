@@ -1,4 +1,4 @@
-package com.example.findapic.data.models
+package com.example.findapic.data.rest.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

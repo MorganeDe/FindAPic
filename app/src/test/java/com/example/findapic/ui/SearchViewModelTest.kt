@@ -5,6 +5,7 @@ package com.example.findapic.ui
 import com.example.findapic.domain.models.FindAPicError
 import com.example.findapic.domain.models.ImageResource
 import com.example.findapic.domain.usecases.SearchImagesUseCase
+import com.example.findapic.domain.usecases.ToggleFavoriteImageUseCase
 import com.example.findapic.helpers.MainDispatcherRule
 import com.example.findapic.ui.commons.images.UiImageItem
 import com.example.findapic.ui.search.SearchImagesViewModel
@@ -32,10 +33,12 @@ class SearchViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val searchImagesUseCase = mockk<SearchImagesUseCase>()
+    private val toggleFavoriteImageUseCase = mockk<ToggleFavoriteImageUseCase>()
 
     @Before
     fun setup() {
-        searchImagesViewModel = SearchImagesViewModel(searchImagesUseCase)
+        searchImagesViewModel =
+            SearchImagesViewModel(searchImagesUseCase, toggleFavoriteImageUseCase)
     }
 
     @Test
@@ -162,5 +165,77 @@ class SearchViewModelTest {
         }
 
         assertThat(queryStates.last()).isEqualTo("new query")
+    }
+
+    @Test
+    fun `onToggleFavorite should update view state with up-to-date images`() = runTest {
+        val imageItem = UiImageItem(
+            id = 0,
+            source = "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&h=130",
+            contentDescription = "Brown Rocks During Golden Hour",
+            imagePageLink = "https://www.pexels.com/photo/brown-rocks-during-golden-hour-2014422/",
+            photographer = "Joey Farina",
+            isFavorite = true,
+        )
+
+        coEvery { searchImagesUseCase.searchImages(any()) } returns flowOf(
+            Result.success(
+                listOf(
+                    ImageResource(
+                        id = 0,
+                        source = "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&h=130",
+                        description = "Brown Rocks During Golden Hour",
+                        imagePageUrl = "https://www.pexels.com/photo/brown-rocks-during-golden-hour-2014422/",
+                        photographer = "Joey Farina",
+                        isFavorite = false,
+                    ),
+                    ImageResource(
+                        id = 1,
+                        source = "source",
+                        description = "description",
+                        photographer = "photographer",
+                        imagePageUrl = "image page link",
+                        isFavorite = false,
+                    ),
+                )
+            )
+        )
+        coEvery { toggleFavoriteImageUseCase.toggleFavoriteImage(any()) } returns Unit
+
+        searchImagesViewModel.onQueryChange("new query")
+        searchImagesViewModel.init()
+        advanceTimeBy(500)
+
+        searchImagesViewModel.onToggleFavorite(imageItem)
+
+        val viewStates = mutableListOf<SearchImagesViewState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            searchImagesViewModel.viewState.toList(viewStates)
+        }
+
+        advanceUntilIdle()
+
+        assertThat(viewStates.last()).isEqualTo(
+            SearchImagesViewState.ImageResultsSuccess(
+                listOf(
+                    UiImageItem(
+                        id = 0,
+                        source = "https://images.pexels.com/photos/2014422/pexels-photo-2014422.jpeg?auto=compress&cs=tinysrgb&h=130",
+                        contentDescription = "Brown Rocks During Golden Hour",
+                        imagePageLink = "https://www.pexels.com/photo/brown-rocks-during-golden-hour-2014422/",
+                        photographer = "Joey Farina",
+                        isFavorite = false,
+                    ),
+                    UiImageItem(
+                        id = 1,
+                        source = "source",
+                        contentDescription = "description",
+                        photographer = "photographer",
+                        imagePageLink = "image page link",
+                        isFavorite = false,
+                    ),
+                )
+            )
+        )
     }
 }

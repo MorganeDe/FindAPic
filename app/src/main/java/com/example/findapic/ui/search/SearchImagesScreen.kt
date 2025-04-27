@@ -25,7 +25,7 @@ fun SearchImagesScreen(viewModel: SearchImagesViewModel = koinViewModel()) {
             onQueryChange = viewModel::onQueryChange,
             onSearch = viewModel::onQueryChange
         )
-        SearchImagesResultContent(query, viewState)
+        SearchImagesResultContent(query, viewState) { viewModel.onToggleFavorite(it) }
     }
     LifecycleStartEffect(key1 = viewModel, lifecycleOwner = LocalLifecycleOwner.current) {
         viewModel.init()

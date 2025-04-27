@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.findapic.commons_io.toFindAPicError
 import com.example.findapic.domain.models.ImageResource
 import com.example.findapic.domain.usecases.SearchImagesUseCase
+import com.example.findapic.domain.usecases.ToggleFavoriteImageUseCase
 import com.example.findapic.ui.commons.images.UiImageItem
+import com.example.findapic.ui.commons.images.toImageResource
 import com.example.findapic.ui.commons.images.toUiImageItems
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,10 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SearchImagesViewModel(private val searchImagesUseCase: SearchImagesUseCase) : ViewModel() {
+class SearchImagesViewModel(
+    private val searchImagesUseCase: SearchImagesUseCase,
+    private val toggleFavoriteImageUseCase: ToggleFavoriteImageUseCase,
+) : ViewModel() {
     val viewState: StateFlow<SearchImagesViewState>
         get() = _viewState
     private val _viewState: MutableStateFlow<SearchImagesViewState> =
@@ -44,6 +49,13 @@ class SearchImagesViewModel(private val searchImagesUseCase: SearchImagesUseCase
 
     fun onQueryChange(newQuery: String) {
         _query.update { newQuery }
+    }
+
+    fun onToggleFavorite(uiImageItem: UiImageItem) {
+        viewModelScope.launch {
+            toggleFavoriteImageUseCase.toggleFavoriteImage(uiImageItem.toImageResource())
+            searchForQuery(query.value)
+        }
     }
 
     private suspend fun searchForQuery(query: String) {
