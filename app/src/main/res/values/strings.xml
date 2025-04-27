@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">FindAPic</string>
+    <string name="search_screen_title">Find A Pic</string>
+    <string name="search_screen_no_results">No picture found for %s!</string>
+    <string name="search_screen_empty_query">Search images by topics!\nFor example, type "Nature" or "Group of people playing" in the search bar.</string>
+    <string name="image_card_photographer_credit">Image by %s on Pexels</string>
+    <string name="search_image_bar_placeholder">Type a topic to find related pictures</string>
+    <string name="search_image_bar_search_icon_content_description">Search icon</string>
 </resources>

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +20,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val apiKeysProperties = Properties()
+        apiKeysProperties.load(project.rootProject.file("apikeys.properties").inputStream())
+        buildConfigField("String", "PEXELS_API_BASE_URL", "\"https://api.pexels.com/v1/\"")
+        buildConfigField(
+            "String",
+            "PEXELS_API_KEY",
+            "\"${apiKeysProperties.getProperty("pexels_api_key") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -30,14 +41,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
